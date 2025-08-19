@@ -13,14 +13,14 @@ from torch import nn
 import os
 
 from dataset import Traditional_Dataset
-from losses import CrossViewConLoss, SimilarityLoss, LogitLoss
+from losses import CrossViewConLoss
 
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from sklearn.metrics import confusion_matrix
-from model import Baseline
+from model import AFFNet
 from utils import cal_metrics, setup_seed
 
 import setproctitle
@@ -242,13 +242,11 @@ if __name__ == "__main__":
         test_loader = DataLoader(testset, batch_size=1, shuffle=False)
         best_acc = 0
         print('Init Model')
-        model = Baseline()
+        model = AFFNet()
         if not args.no_cuda:
             model.to(device)
         criterion = nn.CrossEntropyLoss()
         conloss = CrossViewConLoss()
-        simloss = SimilarityLoss()
-        logit_loss = LogitLoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
         # optimizer = torch.optim.SGD(model.parameters(), momentum=0.9, lr=args.lr, weight_decay=args.reg)
         # optimizer = Adadelta(model.parameters(), lr=args.lr)
